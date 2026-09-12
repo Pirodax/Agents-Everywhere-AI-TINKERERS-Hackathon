@@ -1,6 +1,7 @@
 import { AbstractAgent } from "@ag-ui/client";
 import type { BaseEvent, RunAgentInput } from "@ag-ui/core";
 import { makeAgent } from "agent-core";
+import { SALES_SYSTEM_PROMPT } from "agent-core/sales";
 import { Observable, type Subscription } from "rxjs";
 
 type ChannelAgentFactory = (threadId: string) => AbstractAgent;
@@ -80,6 +81,11 @@ export class ChannelRunAgent extends AbstractAgent {
   }
 }
 
+/** The sales role replaces the kit's on-call prompt; the plumbing is unchanged. */
+function makeSalesAgent(threadId: string) {
+  return makeAgent(threadId, { prompt: SALES_SYSTEM_PROMPT });
+}
+
 export function makeChannelAgent(threadId: string) {
-  return new ChannelRunAgent(makeAgent, threadId);
+  return new ChannelRunAgent(makeSalesAgent, threadId);
 }

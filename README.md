@@ -10,6 +10,24 @@
 
 </div>
 
+---
+
+## This checkout: DealGuard
+
+This repository is a hackathon entry built on the kit's Slack template. **DealGuard** is a Slack agent that checks a sales proposal against the CRM, the email history and internal policy — three specialist agents and a synthesis agent — and posts the verdict with its sources into the thread, before the rep sends anything.
+
+Start at **[apps/channel/README.md](apps/channel/README.md)** for how it works and how to run it, and **[SUBMISSION.md](SUBMISSION.md)** for what was inherited from the kit and what was built during the event.
+
+```bash
+npm run verify                                              # typecheck + 100 offline tests
+npm run coherence -- acme "Offer 15% off if they sign now"   # the same check, in a terminal
+npm run dev:slack                                           # the Slack agent
+```
+
+The kit's own documentation follows, unchanged.
+
+---
+
 ## Overview
 
 Build for **[Agents, Everywhere: Bots, Channels, & More](https://aitinkerers.org/hackathons/global/agents-everywhere)**, the AI Tinkerers global hackathon on **September 12–13, 2026**. Choose your city on the event page for its local schedule. Put an agent inside a conversation, an app, a phone, or a physical environment. Make the context of that place essential to what it can do.

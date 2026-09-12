@@ -1,15 +1,18 @@
 import { createChannel } from "@copilotkit/channels";
-import { isSearchConfigured, isWorkplaceConfigured, WORKPLACE_CONTEXT } from "agent-core";
+import { isSearchConfigured } from "agent-core";
+import { CLIENTS } from "agent-core/sales";
 import { makeChannelAgent } from "./agent";
 import { required } from "./env";
-import { IncidentCard, Timeline, welcomeMessage } from "./components";
-import { proposeAction, readThread, searchTheWeb } from "./tools";
+import { welcomeMessage } from "./sales-components";
+import { checkProposalTool, clientProfileTool } from "./sales-tools";
+import { readThread, searchTheWeb } from "./tools";
 
 // Tools are registered only when their credential is present, so the agent is
 // never handed a tool that will fail when it calls it.
 const tools = [
   readThread,
-  proposeAction,
+  checkProposalTool,
+  clientProfileTool,
   ...(isSearchConfigured() ? [searchTheWeb] : []),
 ];
 
@@ -26,26 +29,33 @@ export const channel = createChannel({
 
   agent: makeChannelAgent,
   tools,
-  components: [IncidentCard, Timeline],
+
+  // No `components`: the cards in this project are posted by the tools that own
+  // the data, not rendered by the model. The agent decides when to check, never
+  // what the verdict says.
 
   // Injected into the agent's prompt on every run.
   context: [
-    
+    {
+      description: "Accounts this deployment can read",
+      value: CLIENTS.map((client) => client.name).join(", "),
+    },
     {
       description: "Rendering",
       value:
-        "You can draw native UI by calling incident_card or timeline. Prefer them over prose whenever the answer has structure.",
+        "check_proposal and client_profile post their own cards. After either returns, add at most one short line. Never restate a card in prose.",
     },
-    ...(isWorkplaceConfigured()
-      ? [{ description: "Workplace", value: WORKPLACE_CONTEXT }]
-      : []),
     {
       description: "Surface",
       value:
-        "This is a chat thread in a channel people are actively working in. Assume others are reading and that some joined late.",
+        "This is the channel where the sales team works a live deal. Others are reading, the client is not, and someone will act on what is said here within the hour.",
+    },
+    {
+      description: "Data",
+      value:
+        "CRM, mailbox and internal docs are sample data behind a connector layer. Say so if asked; never claim to have contacted a client.",
     },
   ],
-
 });
 
 // A mention subscribes the conversation, so the agent then follows along instead
