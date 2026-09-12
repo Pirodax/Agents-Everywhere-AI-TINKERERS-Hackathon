@@ -22,6 +22,16 @@ export interface StructuredRequest {
   maxOutputTokens?: number;
 }
 
+/**
+ * Reasoning models default to spending a lot of thought on a small extraction.
+ * These four calls sit inside a chat delivery with a hard time budget, so the
+ * effort is dialled down where the model supports it — sending `reasoning` to a
+ * model that has none is an API error, hence the guard.
+ */
+function reasoningOption(model: string): Record<string, unknown> {
+  return /^(gpt-5|o[134])/i.test(model) ? { reasoning: { effort: "low" } } : {};
+}
+
 export type StructuredCaller = (
   request: StructuredRequest,
   signal?: AbortSignal,
@@ -71,7 +81,7 @@ function parseJson(text: string, schemaName: string): unknown {
 /** The real caller. Replaced wholesale in tests. */
 export const callStructured: StructuredCaller = async (request, signal) => {
   const { provider, model, apiKey } = providerConfig();
-  const max = request.maxOutputTokens ?? 2000;
+  const max = request.maxOutputTokens ?? 900;
 
   if (provider === "openrouter") {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -108,6 +118,7 @@ export const callStructured: StructuredCaller = async (request, signal) => {
     body: JSON.stringify({
       model,
       max_output_tokens: max,
+      ...reasoningOption(model),
       input: [
         { role: "system", content: request.system },
         { role: "user", content: request.user },

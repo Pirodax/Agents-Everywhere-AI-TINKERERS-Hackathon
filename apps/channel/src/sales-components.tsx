@@ -47,6 +47,16 @@ function citationLine(citation: Citation): string {
   return `${SOURCE_LABELS[citation.source]} · ${citation.title} · ${citation.date}`;
 }
 
+/**
+ * A quote is evidence, not the record. An analyst that hands back half a CRM
+ * entry would push the verdict off the first screen, so the card shows the
+ * opening line and leaves the rest to the source button.
+ */
+function shortQuote(quote: string): string {
+  const firstLine = quote.split("\n")[0]?.trim() ?? quote;
+  return firstLine.length > 180 ? `${firstLine.slice(0, 177)}…` : firstLine;
+}
+
 function coverageLine(report: CoherenceReport): string {
   return report.coverage
     .map((entry) =>
@@ -107,7 +117,7 @@ export function coherenceCard(
             {`${SEVERITY_MARK[finding.severity]} *${finding.statement}*\n${finding.why}\n${finding.sourceIds
               .map((id) => {
                 const citation = report.citations.find((entry) => entry.sourceId === id);
-                return citation ? `> ${citationLine(citation)}\n> "${citation.quote}"` : "";
+                return citation ? `> ${citationLine(citation)}\n> "${shortQuote(citation.quote)}"` : "";
               })
               .filter(Boolean)
               .join("\n")}`}
@@ -171,7 +181,7 @@ export function clientProfileCard(context: ClientContext) {
         <Field label="Value">{context.headline.arr}</Field>
         <Field label="Stage">{context.headline.stage}</Field>
         <Field label="Owner">{context.headline.owner}</Field>
-        <Field label="Renewal">{context.headline.renewalDate}</Field>
+        <Field label="Key date">{context.headline.renewalDate}</Field>
       </Fields>
       <Divider />
       {reachable.map((report) => (

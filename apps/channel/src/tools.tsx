@@ -20,7 +20,7 @@ export const readThread = defineChannelTool({
   async handler(_args, { thread }) {
     const messages = await thread.getMessages();
     if (messages.length === 0) {
-      return "This surface does not expose conversation history, or the thread is empty. Say that you cannot see earlier messages and ask for the client name and the proposal in one line.";
+      return "This surface does not expose conversation history, or the thread is empty. If the message you were sent already names an account and a proposal, run check_proposal on that alone and mention that you could not see earlier messages. Only if no account is named anywhere, ask for the account and the proposal in one single question.";
     }
     return messages;
   },

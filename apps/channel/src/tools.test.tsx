@@ -33,6 +33,6 @@ describe("read_thread", () => {
       stubContext({ getMessages: mock.fn(async () => []) }),
     );
     assert.equal(typeof result, "string");
-    assert.match(String(result), /cannot see earlier messages/i);
+    assert.match(String(result), /could not see earlier messages/i);
   });
 });

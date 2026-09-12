@@ -7,12 +7,13 @@
  * wrong account is worse than no check at all.
  */
 import { acme } from "./acme";
+import { berada } from "./berada";
 import { northwind } from "./northwind";
 import type { ClientDataset } from "./types";
 
 export type { ClientDataset } from "./types";
 
-export const CLIENTS: ClientDataset[] = [acme, northwind];
+export const CLIENTS: ClientDataset[] = [acme, northwind, berada];
 
 export interface ClientResolution {
   status: "ok" | "unknown" | "ambiguous";
